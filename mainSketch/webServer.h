@@ -8,14 +8,13 @@ public:
     WiFiServer server;
     bool useSerial;
     long timeout;
-    bool startSerial;
     int status;
     int registerCount;
     int maxRegister;
     void (**registeredFunctions)(WiFiClient*);
     char** registeredKeywords;
 
-    WebServer(bool _startSerial, bool _useSerial, long _timeout, int _maxRegister);
+    WebServer(bool _useSerial, long _timeout, int _maxRegister);
     ~WebServer();
 
 
@@ -208,9 +207,8 @@ public:
     }
 };
 
-WebServer::WebServer(bool _startSerial, bool _useSerial, long _timeout, int _maxRegister):server(80)
+WebServer::WebServer( bool _useSerial, long _timeout, int _maxRegister):server(80)
 {
-    startSerial = _startSerial;
     useSerial = _useSerial;
     timeout = _timeout;
     status = WL_IDLE_STATUS;

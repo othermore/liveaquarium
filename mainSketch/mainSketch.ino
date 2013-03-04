@@ -8,7 +8,7 @@
 #include "webServer.h"
 
 char settingsFileName[] = "settings.txt";
-WebServer webServer(true, true, 60000,10);
+WebServer webServer(true, 60000,10);
 #include "webServerActions.h"
 
 long prev_millis;

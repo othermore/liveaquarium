@@ -193,24 +193,8 @@
  		}
  		settingsFile = SD.open(file, FILE_WRITE);
 
-    	for(int i = 0; i<d.used; i++)
-    	{
-    		if(d.types[i]== INT)
-    			settingsFile.print("INT");
-    		else if (d.types[i]==FLOAT)
-    			settingsFile.print("FLOAT");
-    		else
-    			settingsFile.print("STRING");
-    		settingsFile.print('\t');
-    		settingsFile.print(d.keys[i]);
-    		settingsFile.print('\t');
-    		if(d.types[i]== INT)
-    			settingsFile.println(*(int*)d.values[i]);
-    		else if (d.types[i]==FLOAT)
-    			settingsFile.println(*(float*)d.values[i]);
-    		else
-    			settingsFile.println((char*)d.values[i]);
-    	}
+    	printSettings(&settingsFile);
+
     	settingsFile.close();
     }
     
