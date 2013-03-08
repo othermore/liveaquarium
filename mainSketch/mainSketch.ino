@@ -4,6 +4,7 @@
 #include <Wire.h>
 #include <SD.h>
 
+#include "relay.h"
 #include "RTClib.h"
 RTC_DS1307 RTC;
 

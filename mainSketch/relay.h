@@ -86,7 +86,6 @@ public:
 	{
 		bool value = get();
 		if (previousValue != (int) value) 
-		)
 		{
 			previousValue = (int)value;
 			if(value)
@@ -113,7 +112,7 @@ Relay::Relay(int pin,relayMode mode, int numChannels):
 	pin(pin), mode(mode), numChannels(numChannels) 
 {
 	previousValue = -1;
-	channels = malloc(sizeof(bool)*numChannels);
+	channels = (bool*)malloc(sizeof(bool)*numChannels);
 }
 
 Relay::~Relay()
