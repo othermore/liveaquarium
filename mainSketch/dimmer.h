@@ -1,9 +1,6 @@
 #ifndef dimmer_h
 #define dimmer_h
 
-#endif
-
-
 class Dimmer
 {
 public:
@@ -17,6 +14,16 @@ public:
 	int day_auto_on;
 	int day_auto_off;
 
+	int onRelayChannel;
+	Relay *onRelay;
+	bool onRelayReversed;
+
+	int offRelayChannel;
+	Relay *offRelay;
+	bool offRelayReversed;
+
+
+
 	enum dimmingMode { OFF, ON, AUTO, MANUAL_DIMMING_ON, MANUAL_DIMMING_OFF };
 	dimmingMode mode;
 	dimmingMode manual_next_mode;
@@ -24,7 +31,6 @@ public:
 
 
 	Dimmer(int pin, int startValue, int endValue, int dimmingDuration, int day_auto_off, int day_auto_on);
-    ~Dimmer();
 
 	void setup()
 	{
@@ -41,11 +47,19 @@ public:
 		switch(mode)
 		{
 			case OFF:
+				if(onRelay)
+					onRelay->setChannel(onRelayChannel, onRelayReversed);
+				if(offRelay)
+					offRelay->setChannel(offRelayChannel, !offRelayReversed);
 				currentValue = 0; 
 				manual_end = 0;
 				fixed_mode = AUTO;
 			break;
 			case ON:
+				if(onRelay)
+					onRelay->setChannel(onRelayChannel, !onRelayReversed);
+				if(offRelay)
+					offRelay->setChannel(offRelayChannel, offRelayReversed);
 				currentValue = 255; 
 				manual_end = 0;
 				fixed_mode = AUTO;
@@ -58,8 +72,7 @@ public:
 				
 				//Vemos el segundo del día en el que estamos
 				currentSecond = (now.hour()*60+now.minute())*60+now.second();
-				currentMode = getCurrentMode(currentSecond);
-
+				currentMode = getCurrentMode(currentSecond);				
 				if (currentMode == ON && currentValue == 0 && fixed_mode != OFF)
 				{
 					//Si tenemos que pasar a ON y estamos en OFF
@@ -86,10 +99,28 @@ public:
 					fixed_mode = AUTO;
 				}
 				//Si no se da ningún caso, estamos en el estado correcto, seguimos así.
+				if(currentValue == 255)
+				{
+					if(onRelay)
+						onRelay->setChannel(onRelayChannel, !onRelayReversed);
+					if(offRelay)
+						offRelay->setChannel(offRelayChannel, offRelayReversed);
+				}
+				if(currentValue == 0)
+				{
+					if(onRelay)
+						onRelay->setChannel(onRelayChannel, onRelayReversed);
+					if(offRelay)
+						offRelay->setChannel(offRelayChannel, !offRelayReversed);
+				}
 
 			break;
 			case MANUAL_DIMMING_ON:
 				now = RTC.now();
+				if(onRelay)
+					onRelay->setChannel(onRelayChannel, onRelayReversed);
+				if(offRelay)
+					offRelay->setChannel(offRelayChannel, offRelayReversed);
 				if(manual_end == 0) //Acabamos de empezar el dimming manual
 				{
 					manual_end = now.unixtime() + dimmingDuration;
@@ -133,6 +164,10 @@ public:
 			break;
 			case MANUAL_DIMMING_OFF:
 				now = RTC.now();
+				if(onRelay)
+					onRelay->setChannel(onRelayChannel, onRelayReversed);
+				if(offRelay)
+					offRelay->setChannel(offRelayChannel, offRelayReversed);
 				if(manual_end == 0) //Acabamos de empezar el dimming manual
 				{
 					manual_end = now.unixtime() + dimmingDuration;
@@ -231,6 +266,34 @@ public:
 		mode = AUTO;
 	}
 
+	void setOnRelay(Relay *relay, int channel, bool reversed)
+	{
+		onRelay = relay;
+		onRelayChannel = channel;
+		onRelayReversed = reversed;
+	}
+
+	void clearOnRelay()
+	{
+		onRelay = 0;
+		onRelayChannel = 0;
+		onRelayReversed = false;
+	}
+
+	void setOffRelay(Relay *relay, int channel, bool reversed)
+	{
+		offRelay = relay;
+		offRelayChannel = channel;
+		offRelayReversed = reversed;
+	}
+
+	void clearOffRelay()
+	{
+		offRelay = 0;
+		offRelayChannel = 0;
+		offRelayReversed = false;
+	}
+
 private:
 
 	dimmingMode getCurrentMode(int currentSecond){
@@ -286,6 +349,8 @@ Dimmer::Dimmer( int pin, int startValue, int endValue, int dimmingDuration, int 
 	day_auto_off(day_auto_off), 
 	day_auto_on(day_auto_on)
 {
+	clearOnRelay();
+	clearOffRelay();
 	currentValue = 0;
 	manual_end = 0;
 	manual_initial = 0;
@@ -294,7 +359,7 @@ Dimmer::Dimmer( int pin, int startValue, int endValue, int dimmingDuration, int 
 	fixed_mode = AUTO;
 }
 
-Dimmer::~Dimmer()
-{
 
-}
+
+
+#endif
