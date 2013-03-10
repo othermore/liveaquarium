@@ -113,6 +113,8 @@ Relay::Relay(int pin,relayMode mode, int numChannels):
 {
 	previousValue = -1;
 	channels = (bool*)malloc(sizeof(bool)*numChannels);
+	for(int i = 0; i< numChannels;i++)
+		channels[i] = false;
 }
 
 Relay::~Relay()
